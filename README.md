@@ -91,44 +91,44 @@ npm run build
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 
-###Vue2.X文档
+###Vue2.X文档  
 [Vue 英文](https://vuejs.org/v2/guide/index.html)  
 [Vue 中文](https://cn.vuejs.org/v2/guide/index.html)  
 
-###vue-router2.x 文档
+###vue-router2.x 文档  
 [vue-router2.x 中文](https://router.vuejs.org/zh-cn/index.html)   
 [vue-router2.x 英文](https://router.vuejs.org/en/)               
 
-###Vuex2.X 文档
+###Vuex2.X 文档  
 [Vuex2.X 英文](https://vuex.vuejs.org/en/)  
 [Vuex2.X 中文](https://vuex.vuejs.org/zh-cn/)
 
 #vue  ajax   1.axios   2.vue-resource
  
-###webapck 2.X 文档
+###webapck 2.X 文档  
 [webapck 2.X 英文](https://webpack.js.org/)  
 [webapck 2.X 中文](https://doc.webpack-china.org/)  
 
-###koa文档
+###koa文档  
 [koa 英文](http://koajs.com/)        
 [koa 中文](http://koa.bootcss.com/) 
 
-###node.js 文档
+###node.js 文档  
 [node.js 英文](https://nodejs.org/en/docs/)  
 [node.js 中文](http://nodejs.cn/)
 
-###阮一峰 es6 入门
+###阮一峰 es6 入门  
 [阮一峰 es6 入门](http://es6.ruanyifeng.com/)
 
-###git
+###git  
 [Git](https://github.com/git)
 
 
 
-###github项目
+###github项目  
 ##[GitHub](https://github.com/ayuhuajin)  
 ##[Blog](http:wsinghai.com)
-
+```html
 #基础目录结构
 │  .eslintignore    
 │  .eslintrc.js
@@ -223,6 +223,7 @@ For detailed explanation on how things work, consult the [docs for vue-loader](h
             public.js
             rem.js
             solve.js
+```
 
 ##关于作者
 

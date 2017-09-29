@@ -1,226 +1,254 @@
-# simba-v9.0前端规范
+#webpack 
+=================
 
-> * **浏览器兼容要求** ： `ie9+（包括IE9）` `谷歌` `火狐` 等其他一些主流浏览器
-> * **分辨率兼容要求** `1366*768` 至 `1920*1080`
-> * 劳烦UI出一个**浏览器不兼容友情提示页面**告知用户需更换合适的浏览器
-> * `404等页面` UI也应该提供，部分页面排版应考虑**无数据**和**数据过多**时这两个极端情况
-> * 若涉及过多的图标，UI应在**阿里巴巴字体图标库**生成图标供web前端使用
-> * 如有不合理之处，可提出共同探讨并稍作修改
+# vue2 + webpack + koa + es6 + vue-router + node
 
----
+###图片与第三方插件 直接从 src 复制至 build  
 
-## 通用
-- [x] 文件编码采用**UTF-8**格式
-- [x] 使用**4个空格**作为缩进，**sublime编辑器**可以把**tab转为空格**
-- [x] 所有文件结尾留一个空行，多余的要删除
-- [x] 开发阶段一律使用未压缩的文件，后期会使用gulp对相关文件进行压缩
-- [x] 养成**合理注释**的习惯，该换行的换行，该缩进的缩进，该空格的空格，**不要全部堆在一起**
+##html
+html文件 利用htmlWebpackPlugin 生成
+可指明模板文件的位置 与 生成文件的位置
 
----
-
-## html书写规则
-- [x] 文件名称使用中文命名，形如 `登入.html` `下载.html`
-- [x] 每个页面的**body**添加一个形如 `.page-index` `.page-login`的类名来表示 `css命名空间`
-- [x] 标签属性使用双引号，删除空值属性，属性书写顺序 `id` > `css` > `其余属性任意`
-- [x] 若无特别需求，反对写 `style="color:red;"` `onclick="alert('不建议把脚本写html标签上')"`
-- [x] 不要指定引入资源所带的具体协议。当引入图片或其他媒体文件，还有样式和脚本时，URLs 所指向的具体路径，不要指定协议部分（http:, https:），除非这两者协议都不可用。
-```html
-/*不推荐*/
-<script src="http://cdn.com/foundation.min.js"></script>
-/* 推荐：*/
-<script src="//cdn.com/foundation.min.js"></script>
+html 模板 文件
+```js
+new htmlWebpackPlugin({
+    template:'./src/html/index.html', 
+    title: 'index',
+    filename:'html/index-[hash:5].html',
+    inject:false,            //是否自动插入代码,如果需要请设置为true
+    date: new Date(),
+    minify: {                //文件压缩
+        removeComments:true,
+        collapseWhitespace:true
+    },
+    chunks: ['public', 'index','common']   //引入代码模块  
+})
 ```
-###html模板
-```html
-<!DOCTYPE html>
-<html lang="zh-CN">
-    <head>
-        <meta charset="utf-8">
-        <title>主体框架</title>
-    </head>
-    <body class="page-frame">
-        <!-- 框架头部 开始 -->
-        <div class="head-box clearfix">
 
-            <!-- 右侧菜单 开始 -->
-            <ul class="menu-list clearfix">
-                <li>
-                    <i class="iconfont icon-gg"></i>
-                    <span>公告</span>
-                    <em class="animated">88</em>
-                </li>
-            </ul>
-            <!-- 右侧菜单 结束 -->
 
-            <!-- 全屏按钮 开始 -->
-            <a class="btn-full-page iconfont icon-zdh" href="javascript:;"></a>
-            <!-- 全屏按钮 结束 -->
-        </div>
-        <!-- 框架头部 结束 -->
+#css
+extract-text-webpack-plugin
+将你的行内样式提取到单独css文件夹
 
-        <!-- 脚本引入 开始 -->
-        <script src="../js/page.js"></script>
-        <!-- 脚本引入 结束 -->
-    </body>
-</html>
-```
-- [x] 所有页面的模板结构都基于 `模板.html`页面
-
----
-
-##css书写规则
-
-- [x] 以形如 `.p-header` `.p-footer` 的类名表明该样式是可以被复用的
-- [x] `css预处理器` 采用 `sass`，相同性质的属性应写一行
-- [x] 某个页面的样式文件命名 采用 `pageIndex.scss` 的形式
 ```css
-// 二级菜单
-.inner-menu-wrap{
+const extractCSS = new extractTextPlugin('sass/[name]-[chunkhash].css');
+const extractSASS = new extractTextPlugin('sass/[name].css');
 
-    & > li{
-        position: relative;
-        padding-left:19px;
-        &:before{
-            position: absolute; content: "";
-            left:0;top:0;bottom:0;
-            width:3px;
-            transform: scaleY(0);
-            transition-duration: 0.2s;
-            background:#f90;
-        }
+```
+想要引入css 就在对应的 js中引入
+例如在case.js中
+```js
+import '../sass/case.scss'; (js 语法)
+```
 
-        &:hover:before{
-            transform: scaleY(1);
-        }
+#js
+webpack.optimize.CommonsChunkPlugin   
+可提取公共的文件
+
+```js
+new webpack.optimize.CommonsChunkPlugin({
+    name:'common', // 注意不要.js后缀   name是提取公共代码块后js文件的名字。
+    chunks:['case','public','index','solve']   //只有在vendor中配置的文件才会提取公共代码块至manifest的js文件中
+})
+```
+
+common 为提取的公共js 文件，名字可自取
+chunks 表明 要提取公共模块的几个js文件
+
+
+```js
+{ 
+    test: /\.js$/,
+    exclude: path.resolve(__dirname,'/node_modules/'), 
+    include: path.resolve(__dirname, './src/') ,
+    loader: "babel-loader",
+    query: {
+        presets: ['latest']
     }
 }
 ```
 
-- [x] url() 、属性选择符、属性值使用双引号
-```css
-/* 不建议这么做 */
-html{font-family: 'open sans', arial, sans-serif;}
-.selector[type='text']{color:#333;}
-/* 建议这么做 */
-html{font-family: "open sans", arial, sans-serif;}
-.selector[type="text"]{color:#333;}
+也可单独提取出来配置
+
+Babel的配置文件是 .babelrc ，存放在项目的根目录下
+
+
+> A Vue.js project
+
+## Build Setup
+
+``` bash
+# install dependencies
+npm install
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
 ```
 
----
+For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-##js书写规则
-- [x] 变量命名规范
-```js
-s：表示字符串。例如：sName，sHtml;
-n：表示数字。例如：nPage，nTotal;
-b：表示逻辑。例如：bChecked，bHasLogin;
-a：表示数组。例如：aList，aGroup;
-r：表示正则表达式。例如：rDomain，rEmail;
-f：表示函数。例如：fGetHtml，fInit;
-o：表示以上未涉及到的其他对象，例如：oButton，oDate;
-```
 
-- [x] 变量、函数、函数的参数 使用 驼峰 命名法
-```js
-var oLoadingModules = {};
-function fSetVerificCode(object,nTotalTime)
-{
-    ...
-}
-```
+###Vue2.X文档
+[Vue 英文](https://vuejs.org/v2/guide/index.html)  
+[Vue 中文](https://cn.vuejs.org/v2/guide/index.html)  
 
-- [x] 常量全部字母大写，单词间下划线分隔的命名方式
-```js
-var HTML_ENTITY = {};
-```
+###vue-router2.x 文档
+[vue-router2.x 中文](https://router.vuejs.org/zh-cn/index.html)   
+[vue-router2.x 英文](https://router.vuejs.org/en/)               
 
-- [x] 私有属性、变量和方法以下划线 _ 开头
-```js
-var _oPrivateMethod = {};
-var _this = $(this);
-```
----
+###Vuex2.X 文档
+[Vuex2.X 英文](https://vuex.vuejs.org/en/)  
+[Vuex2.X 中文](https://vuex.vuejs.org/zh-cn/)
 
-#simba-v9.0前端目录结构
+#vue  ajax   1.axios   2.vue-resource
+ 
+###webapck 2.X 文档
+[webapck 2.X 英文](https://webpack.js.org/)  
+[webapck 2.X 中文](https://doc.webpack-china.org/)  
 
-```html
-simba-v9.0
-    │  gulpfile.js   【gulp编译配置脚本】
-    │  package.json  【组件依赖关系】
-    │  readMe.md     【该项目说明文档】
+###koa文档
+[koa 英文](http://koajs.com/)        
+[koa 中文](http://koa.bootcss.com/) 
+
+###node.js 文档
+[node.js 英文](https://nodejs.org/en/docs/)  
+[node.js 中文](http://nodejs.cn/)
+
+###阮一峰 es6 入门
+[阮一峰 es6 入门](http://es6.ruanyifeng.com/)
+
+###git
+[Git](https://github.com/git)
+
+
+
+###github项目
+##[GitHub](https://github.com/ayuhuajin)  
+##[Blog](http:wsinghai.com)
+
+#基础目录结构
+│  .eslintignore    
+│  .eslintrc.js
+│  .gitignore
+│  package-lock.json
+│  package.json
+│  postcss.config.js
+│  README.md
+│  temple.html
+│  webpack.config.js
+│
+├─build
+│  ├─html
+│  │      case.html
+│  │      index-7d35b.html
+│  │      index.html
+│  │      solve.html
+│  │
+│  ├─images
+│  │  ├─base
+│  │  │      bulb.png
+│  │  │      code.png
+│  │  │      favicon.png
+│  │  │      upload.png
+│  │  │      what.png
+│  │  │
+│  │  ├─case
+│  │  │      code.png
+│  │  │
+│  │  ├─index
+│  │  │      favicon.png
+│  │  │
+│  │  └─solve
+│  │          upload.png
+│  │
+│  ├─libs
+│  │  └─jquery-2.1.4
+│  │          jquery.js
+│  │
+│  ├─sass
+│  │      case-1671179bb6b7945ed59a.css
+│  │      case.css
+│  │      index-d0a2c5b4819dc1a808a7.css
+│  │      index.css
+│  │      solve-14744d89a684a24429ab.css
+│  │      solve.css
+│  │
+│  └─script
+│          case.js
+│          common.js
+│          index.js
+│          public.js
+│          solve.js
+│
+└─src
+    ├─html
+    │      case.html
+    │      index.html
+    │      solve.html
     │
-    ├─build  【产出目录】
-    │  ├─css
-    │  ├─html
-    │  ├─images
-    │  ├─scripts
-    │  └─widget
-    └─src    【源码目录】
-        ├─html
-        │      价格.html
-        │      模板.html
-        │
-        ├─images
-        │  ├─base
-        │  │      android.png
-        │  │      ke-fu.png
-        │  │
-        │  ├─demo
-        │  │      01.jpg
-        │  │      02.jpg
-        │  │
-        │  └─index
-        │          banner-01.jpg
-        │
-        ├─sass
-        │      main.scss      【样式主入口】
-        │      pageIndex.scss 【首页页面对应的sass】
-        │      public.scss    【复用样式】
-        │      resetPc.scss   【基础重置样式】
-        │
-        ├─scripts
-        │      public.js      【公用脚本】
-        │      tab.js         【自己封装的选项卡脚本】
-        │      throttle.js    【自己封装的函数节流脚本】
-        │
-        └─widget              【第三方插件】
-            └─jquery-v1.11.3  【JQ插件】
-                    jquery.js
-```
-
-##github项目
-
-
-* [github](http://mouapp.com/) 
+    ├─images
+    │  ├─base
+    │  │      bulb.png
+    │  │      code.png
+    │  │      favicon.png
+    │  │      upload.png
+    │  │      what.png
+    │  │
+    │  ├─case
+    │  │      code.png
+    │  │
+    │  ├─index
+    │  │      favicon.png
+    │  │
+    │  └─solve
+    │          upload.png
+    │
+    ├─libs
+    │  └─jquery-2.1.4
+    │          jquery.js
+    │
+    ├─sass
+    │      case.scss
+    │      index.scss
+    │      mReset.scss
+    │      public.css
+    │      solve.scss
+    │
+    └─script
+            case.js
+            index.js
+            public.js
+            rem.js
+            solve.js
 
 ##关于作者
 
-```javascript
-  var ihubo = {
+```js
+  var author = {
     nickName  : "wsinghai",
     site : "http://wsinghai.com"
   }
 ```
 
-
 ##有问题反馈
-在使用中有任何问题，欢迎反馈给我，可以用以下联系方式跟我交流
+在使用中有任何`问题`，欢迎反馈给我，可以用以下联系方式跟我交流
 
-* 邮件(xxxxx@gmail.com, 把#换成@)
 * QQ: 455493143
-* twitter: [@ihubo](http://xxxxxxxx)
 * https://ayuhuajin.github.io/test/
 
 
-echo "# webpack" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git remote add origin https://github.com/ayuhuajin/webpack.git
-git push -u origin master
-…or push an existing repository from the command line
+* echo "# webpack" >> README.md
+* git init 
+* git add README.md
+* git commit -m "first commit"
+* git remote add origin https://github.com/ayuhuajin/webpack.git
+* git push -u origin master
+* …or push an existing repository from the command line
 
-git remote add origin https://github.com/ayuhuajin/webpack.git
-git push -u origin master
-…or import code from another repository
-You can initialize this repository with code from a Subversion, Mercurial, or TFS project.
+* git remote add origin https://github.com/ayuhuajin/webpack.git
+* git push -u origin master
+* …or import code from another repository
+* You can initialize this repository with code from a Subversion, Mercurial, or TFS project.

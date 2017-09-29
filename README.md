@@ -169,11 +169,11 @@ For detailed explanation on how things work, consult the [docs for vue-loader](h
 │  │          jquery.js
 │  │
 │  ├─sass
-│  │      case-1671179bb6b7945ed59a.css
+│  │      case-ed59a.css
 │  │      case.css
-│  │      index-d0a2c5b4819dc1a808a7.css
+│  │      index-808a7.css
 │  │      index.css
-│  │      solve-14744d89a684a24429ab.css
+│  │      solve-429ab.css
 │  │      solve.css
 │  │
 │  └─script
